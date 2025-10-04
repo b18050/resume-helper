@@ -49,10 +49,8 @@ test_*.tex
 *~
 .DS_Store
 
-# Company directories (these contain generated resumes)
-# Uncomment if you want to ignore company directories:
-# */Chandan_Prakash_Software.pdf
-# */Chandan_Prakash_Software.tex
+# Generated resumes directory (contains personal data)
+resumes/
 
 # Keep main.tex (your base resume)
 !main.tex

@@ -48,8 +48,11 @@ def process_resume():
     safe_company_name = re.sub(r'[^\w\s-]', '', company_name)
     safe_company_name = re.sub(r'[-\s]+', '_', safe_company_name).strip('_')
     
-    # Create company directory
-    company_dir = BASE_DIR.parent / safe_company_name
+    # Create company directory inside resumes/
+    resumes_dir = BASE_DIR.parent / "resumes"
+    resumes_dir.mkdir(exist_ok=True)
+    
+    company_dir = resumes_dir / safe_company_name
     company_dir.mkdir(exist_ok=True)
     
     resume_source = request.form.get("resume_source", "upload")
@@ -179,7 +182,7 @@ def process_resume():
         "warnings": warnings,
         "company_name": company_name,
         "safe_company_name": safe_company_name,
-        "output_dir": str(company_dir.relative_to(BASE_DIR.parent)),
+        "output_dir": f"resumes/{safe_company_name}",
     }
     return jsonify(response_payload)
 
@@ -200,7 +203,11 @@ def compile_pdf():
             import re
             safe_company_name = re.sub(r'[^\w\s-]', '', company_name)
             safe_company_name = re.sub(r'[-\s]+', '_', safe_company_name).strip('_')
-            company_dir = BASE_DIR.parent / safe_company_name
+            
+            resumes_dir = BASE_DIR.parent / "resumes"
+            resumes_dir.mkdir(exist_ok=True)
+            
+            company_dir = resumes_dir / safe_company_name
             company_dir.mkdir(exist_ok=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
