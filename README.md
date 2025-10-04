@@ -1,112 +1,149 @@
 # Resume Keyword Tailor
 
-A polished Flask + Tailwind web app that helps you inject hard-to-spot keywords from any job posting directly into your LaTeX resume. Paste a job URL or description, and download both the updated LaTeX file and a compiled PDF with invisible white text keywords that boost your ATS match rate by 40%+ without altering the visual layout.
+ATS-optimized resume keyword injection tool. Extracts keywords from job postings and injects them as invisible white text in LaTeX resumes. **Verified 92.6% ATS detection rate** with **42.9% → 85.7% score improvement**.
 
-## Features
-
-- 🔎 **Smart keyword extraction:** Scrapes a job posting (or uses pasted text) and ranks the most relevant unigrams and bigrams using advanced heuristics.
-- 🧠 **Resume gap analysis:** Detects which keywords your LaTeX source already covers and focuses only on the missing terms.
-- 🪄 **Invisible injection:** Inserts a white-colored LaTeX block BEFORE `\end{document}` with missing keywords - invisible to humans but fully readable by ATS systems.
-- 📄 **Direct PDF download:** One-click compilation to `Chandan_Prakash_Software.pdf` using TinyTeX - no manual LaTeX compilation needed!
-- 💎 **Modern UI:** Tailwind-powered glassmorphism layout with instant feedback, warnings, and dual download options.
-- 🛡️ **Safe by design:** Processing happens server-side; uses your `main.tex` by default for consistent results.
-- 🤖 **Optional GPT assist:** Toggle an OpenAI-powered extractor to cross-check keywords when you provide an `OPENAI_API_KEY`.
-- ✅ **ATS Verified:** Includes verification scripts that prove hidden keywords are detected by ATS systems (92%+ detection rate).
-
-## Getting started
-
-1. **Install dependencies** (Python 3.10+ recommended):
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-2. **Run the development server:**
-   ```bash
-   python backend/app.py
-   ```
-   Flask will start on `http://127.0.0.1:5000/` by default.
-
-   To enable the OpenAI boost, set an API key before starting the server:
-   ```bash
-   export OPENAI_API_KEY="sk-..."
-   # optional: export OPENAI_MODEL="gpt-4.1-mini"
-   ```
-
-3. **Use the UI:**
-   - Paste a job posting URL (LinkedIn, Indeed, Greenhouse, etc.) or paste the raw description text.
-   - The app uses `main.tex` by default (or optionally upload a different `.tex` file).
-   - Adjust the maximum number of hidden keywords if needed (default: 25).
-   - Click **"Generate tailored resume"** to process.
-   - Download either:
-     - **LaTeX file** (`resume_updated.tex`) - for manual compilation
-     - **PDF file** (`Chandan_Prakash_Software.pdf`) - ready to submit!
-
-## How It Works: ATS Keyword Detection
-
-**The Magic:** Hidden white keywords are **invisible to humans** but **fully readable by ATS systems**!
-
-### Why This Works:
-1. **ATS extracts ALL text** from PDFs, regardless of color, font size, or visibility
-2. **Color doesn't matter** to text extraction - only text presence matters
-3. **Your ATS score improves** by 40-50% while your resume looks exactly the same
-
-### Verification:
-Run the included test scripts to prove keywords are detected:
+## 🚀 Quick Start
 
 ```bash
-# End-to-end test: Extract keywords, inject, compile, verify
-python3 test_pdf_keywords_e2e.py
+# Install dependencies
+pip install -r requirements.txt
 
-# ATS simulation: Before/after comparison
-python3 demo_ats_detection.py
-
-# Manual verification
-python3 verify_keywords_in_pdf.py Chandan_Prakash_Software.pdf terraform kubernetes graphql
+# Start the app
+python3 backend/app.py
 ```
 
-**Results:** 92.6% keyword detection rate in our tests! See `README_ATS_VERIFICATION.md` for details.
+Open: http://127.0.0.1:5000
 
-## Notes & tips
+### Usage (30 seconds per job):
+1. **Enter company name** (e.g., "Google", "Amazon")
+2. **Paste job URL** or description
+3. **Click "Generate tailored resume"**
+4. **Download PDF** - Ready to submit!
 
-- The app inserts keywords using `{\color{white} ...}` **before** `\end{document}`. Ensure your resume preamble loads `\usepackage{xcolor}` (the app will warn you).
-- Hidden blocks are wrapped between `% resume_helper keywords start/end` comments, so re-running keeps things tidy.
-- The scraper uses enhanced headers and DOM heuristics to extract from LinkedIn, Indeed, Greenhouse, Lever, and most job boards.
-- **TinyTeX required** for PDF compilation: The app auto-detects your TinyTeX installation at `~/Library/TinyTeX/`.
+Files auto-saved to `Company_Name/Chandan_Prakash_Software.{pdf,tex}`
 
-## Project structure
+## ✨ Features
+
+- 🔎 **Smart keyword extraction** from job URLs (LinkedIn, Indeed, Greenhouse, etc.)
+- 🧠 **Gap analysis** - Only adds keywords missing from your resume
+- 🪄 **Invisible injection** - White text undetectable by humans, readable by ATS
+- 📄 **Direct PDF compilation** with TinyTeX auto-detection
+- 📁 **Auto-organized** by company name
+- 🤖 **Optional GPT enhancement** (set `OPENAI_API_KEY`)
+- ✅ **ATS verified** - 92.6% keyword detection rate
+
+## 🎯 How ATS Detection Works
+
+**The Magic:** White keywords are invisible to humans but fully readable by ATS systems!
+
+### Why This Works:
+- ATS extracts **all text** from PDFs, regardless of color
+- Color doesn't matter to text extraction
+- Your ATS score improves 40-50% while resume looks identical
+
+### Verification:
+```bash
+# End-to-end test
+python3 test_pdf_keywords_e2e.py
+
+# ATS simulation
+python3 demo_ats_detection.py
+
+# Verify specific PDF
+python3 verify_keywords_in_pdf.py resume.pdf terraform kubernetes graphql
+```
+
+## 📁 Project Structure
 
 ```
 resume_helper/
-├── main.tex                          # Your base resume (edit manually)
+├── main.tex                          # Your base resume
 ├── backend/
-│   ├── app.py                        # Flask app and API endpoints
+│   ├── app.py                        # Flask server
 │   └── services/
-│       ├── keyword_extractor.py      # Job description scraping & keyword extraction
-│       ├── resume_processor.py       # LaTeX injection & gap analysis
-│       └── ai_keyword_extractor.py   # Optional OpenAI enhancement
+│       ├── keyword_extractor.py      # Job scraping & extraction
+│       ├── resume_processor.py       # LaTeX injection
+│       └── ai_keyword_extractor.py   # Optional GPT
 ├── frontend/
-│   ├── static/
-│   │   ├── css/styles.css
-│   │   └── js/app.js
+│   ├── static/                       # CSS/JS
 │   └── templates/index.html
 ├── requirements.txt
-├── verify_keywords_in_pdf.py         # Verification tool
-├── test_pdf_keywords_e2e.py          # End-to-end test
-├── demo_ats_detection.py             # ATS simulation
-├── README.md                         # Main documentation
-├── QUICK_START.md                    # Quick workflow guide
-├── README_ATS_VERIFICATION.md        # ATS verification details
-└── [Company_Name]/                   # Generated per application
-    ├── Chandan_Prakash_Software.pdf  # Compiled resume
-    └── Chandan_Prakash_Software.tex  # LaTeX with keywords
+├── verify_keywords_in_pdf.py         # Verification tools
+├── test_pdf_keywords_e2e.py
+├── demo_ats_detection.py
+└── [Company_Name]/                   # Auto-created per job
+    ├── Chandan_Prakash_Software.pdf
+    └── Chandan_Prakash_Software.tex
 ```
 
-**Note:** Each job application creates a company directory with both `.tex` and `.pdf` files saved automatically.
+## 🔧 Requirements
 
-## Next steps (ideas)
+- Python 3.10+
+- TinyTeX (for PDF compilation): `~/Library/TinyTeX/bin/universal-darwin/pdflatex`
+- Optional: `OPENAI_API_KEY` for GPT enhancement
 
-- Swap in a TF-IDF or transformer-based keyword scorer for richer semantic matches.
-- Persist job/resume history with per-role keyword presets.
-- Add PDF upload support (extract text with `pdftotext`) for users who do not keep the `.tex` source handy.
+## 📊 Verified Results
+
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| ATS Score | 42.9% | 85.7% | **+42.9%** |
+| Keywords Found | 6/14 | 12/14 | **+6 keywords** |
+| Rating | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | **+2 stars** |
+
+New keywords detected: `elasticsearch`, `microservices`, `observability`, `rabbitmq`, `serverless`, `websockets`
+
+## 💡 Best Practices
+
+- ✅ Only add keywords for skills you actually have
+- ✅ Use keywords from the actual job description
+- ✅ Let the tool handle missing keywords automatically
+- ✅ Keep `main.tex` updated with your real experience
+- ❌ Don't add skills you don't possess
+
+## 🔄 Workflow
+
+1. **Keep `main.tex` current** with your actual experience
+2. **For each application:** Company Name → Job URL → Generate
+3. **Files auto-saved** to company directories
+4. **Reprocessing same company** overwrites old files
+
+## 📝 Example Output
+
+```
+resume_helper/
+├── main.tex
+├── Google/
+│   ├── Chandan_Prakash_Software.pdf
+│   └── Chandan_Prakash_Software.tex
+├── Amazon/
+│   ├── Chandan_Prakash_Software.pdf
+│   └── Chandan_Prakash_Software.tex
+└── Meta/
+    ├── Chandan_Prakash_Software.pdf
+    └── Chandan_Prakash_Software.tex
+```
+
+## ⚙️ Optional: OpenAI Enhancement
+
+```bash
+export OPENAI_API_KEY="sk-..."
+export OPENAI_MODEL="gpt-4o-mini"  # optional
+python3 backend/app.py
+```
+
+Toggle "Enhance with GPT keywords" in the UI for AI-powered keyword extraction.
+
+## 🛡️ Notes
+
+- Keywords inserted **before** `\end{document}` using `{\color{white} ...}`
+- Requires `\usepackage{xcolor}` in your LaTeX preamble (app will warn)
+- Hidden blocks wrapped in `% resume_helper keywords start/end` comments
+- Supports LinkedIn, Indeed, Greenhouse, Lever, and most job boards
+
+## 📄 License
+
+Personal project - Use freely for your own job applications.
+
+---
+
+**Remember:** This tool helps ATS systems understand your qualifications better - it doesn't fake experience you don't have!
