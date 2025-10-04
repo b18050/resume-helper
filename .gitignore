@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+env/
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.toc
+*.lof
+*.lot
+
+# Test outputs
+test_*.pdf
+test_*.tex
+*_test.pdf
+*_test.tex
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Company directories (these contain generated resumes)
+# Uncomment if you want to ignore company directories:
+# */Chandan_Prakash_Software.pdf
+# */Chandan_Prakash_Software.tex
+
+# Keep main.tex (your base resume)
+!main.tex

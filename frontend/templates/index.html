@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Keyword Tailor</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body class="bg-slate-950 min-h-screen text-slate-100 font-inter">
+    <div class="noise-overlay"></div>
+    <header class="relative">
+      <div class="max-w-6xl mx-auto px-6 pt-16 pb-10">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center">
+          <div class="flex-1">
+            <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-1 text-sm text-white/70 backdrop-blur">
+              <span class="inline-block h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+              ATS-Friendly Resume Booster
+            </div>
+            <h1 class="mt-6 text-4xl font-semibold leading-tight text-white md:text-5xl">
+              Tailor your LaTeX resume to every job with one click.
+            </h1>
+            <p class="mt-4 text-lg text-white/70 md:text-xl">
+              Paste a job posting or drop the link, upload your resume, and let the helper inject the precise keywords recruiters are searching for&mdash;invisibly.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3 text-sm text-white/60">
+              <span class="badge">Keyword extraction</span>
+              <span class="badge">ATS optimization</span>
+              <span class="badge">LaTeX ready</span>
+              <span class="badge">No visual changes</span>
+            </div>
+          </div>
+          <div class="relative flex-1">
+            <div class="glass-card gradient-border p-6">
+              <h2 class="text-xl font-semibold text-white">How it works</h2>
+              <ol class="mt-4 space-y-3 text-sm text-white/70">
+                <li class="step">Drop a job URL or paste the description text.</li>
+                <li class="step">Upload your LaTeX resume file.</li>
+                <li class="step">Review the suggested keywords before exporting.</li>
+              </ol>
+              <p class="mt-4 text-xs text-white/40">
+                Keywords are appended in a white text block, so they remain invisible in your rendered PDF but count for Applicant Tracking Systems.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="relative z-10 pb-24">
+      <section class="max-w-6xl mx-auto px-6">
+        <div class="glass-card gradient-border overflow-hidden">
+          <div class="grid gap-10 p-8 lg:grid-cols-2 lg:gap-12">
+            <form id="job-form" class="space-y-6">
+              <div>
+                <label class="form-label" for="company_name">Company name <span class="text-red-400">*</span></label>
+                <input
+                  id="company_name"
+                  name="company_name"
+                  type="text"
+                  placeholder="e.g., Google, Microsoft, Amazon..."
+                  class="form-input"
+                  required
+                />
+                <p class="mt-1 text-xs text-white/40">Files will be saved in: /company_name/Chandan_Prakash_Software.pdf</p>
+              </div>
+
+              <div>
+                <label class="form-label" for="job_url">Job description URL</label>
+                <input
+                  id="job_url"
+                  name="job_url"
+                  type="url"
+                  placeholder="https://www.linkedin.com/jobs/view/..."
+                  class="form-input"
+                />
+              </div>
+
+              <div>
+                <label class="form-label" for="job_description">Or paste the job description</label>
+                <textarea
+                  id="job_description"
+                  name="job_description"
+                  rows="6"
+                  placeholder="Paste the responsibilities, requirements, and desired skills here..."
+                  class="form-textarea"
+                ></textarea>
+              </div>
+
+              <div class="flex flex-col gap-4">
+                <div class="flex gap-4">
+                  <div class="flex-1">
+                    <label class="form-label" for="keyword_target">Max hidden keywords</label>
+                    <input
+                      id="keyword_target"
+                      name="keyword_target"
+                      type="number"
+                      min="5"
+                      max="60"
+                      value="25"
+                      class="form-input"
+                    />
+                  </div>
+                </div>
+                
+                <div class="space-y-3">
+                  <span class="form-label">Resume source (using main.tex by default)</span>
+                  <div class="resume-source-options">
+                    <label class="resume-source-option">
+                      <input type="radio" name="resume_source" value="default" id="resume_source_default" checked />
+                      <span>Use <code>main.tex</code> (recommended)</span>
+                    </label>
+                    <label class="resume-source-option">
+                      <input type="radio" name="resume_source" value="upload" id="resume_source_upload" />
+                      <span>Upload different .tex file</span>
+                    </label>
+                  </div>
+                  <div id="upload-section" class="hidden">
+                    <label class="form-label" for="resume">Upload LaTeX resume (.tex)</label>
+                    <input id="resume" name="resume" type="file" accept=".tex" class="form-input cursor-pointer" />
+                  </div>
+                  <div class="ai-toggle">
+                    <div>
+                      <p class="font-semibold text-sm text-white/85">Enhance with GPT keywords</p>
+                      <p class="text-xs text-white/45">Combine our heuristic extraction with OpenAI (requires <code>OPENAI_API_KEY</code>).</p>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" name="use_ai_keywords" id="use_ai_keywords" value="true" />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="primary-button"
+              >
+                <span id="button-text">Generate tailored resume</span>
+                <span id="button-loader" class="loader hidden"></span>
+              </button>
+
+              <p id="form-hint" class="text-xs text-white/40">
+                Your resume never leaves this session. Upload a `.tex` file or point the tool at the existing <code>main.tex</code> in this project to reuse it instantly.
+              </p>
+            </form>
+
+            <div id="results-panel" class="space-y-6">
+              <div class="card-stack">
+                <div id="status-card" class="result-card hidden"></div>
+                <div id="warning-card" class="result-card hidden"></div>
+                <div id="extracted-card" class="result-card hidden"></div>
+                <div id="keywords-card" class="result-card hidden"></div>
+                <div id="block-card" class="result-card hidden"></div>
+              </div>
+              <div id="download-wrapper" class="hidden space-y-3">
+                <button id="download-button" class="secondary-button w-full">
+                  Download updated LaTeX file
+                </button>
+                <button id="download-pdf-button" class="primary-button w-full">
+                  <span id="pdf-button-text">Download PDF (Chandan_Prakash_Software.pdf)</span>
+                  <span id="pdf-button-loader" class="loader hidden"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/js/app.js" defer></script>
+  </body>
+</html>
