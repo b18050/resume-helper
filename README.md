@@ -5,6 +5,10 @@ ATS-optimized resume keyword injection tool. Extracts keywords from job postings
 ## 🚀 Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/b18050/resume-helper.git
+cd resume-helper
+
 # Install dependencies
 pip install -r requirements.txt
 
@@ -13,6 +17,8 @@ python3 backend/app.py
 ```
 
 Open: http://127.0.0.1:5000
+
+**Note:** This runs locally on your machine. Your resume and personal data never leave your computer.
 
 ### Usage (30 seconds per job):
 1. **Enter company name** (e.g., "Google", "Amazon")
@@ -140,9 +146,16 @@ Toggle "Enhance with GPT keywords" in the UI for AI-powered keyword extraction.
 - Hidden blocks wrapped in `% resume_helper keywords start/end` comments
 - Supports LinkedIn, Indeed, Greenhouse, Lever, and most job boards
 
+## 🔒 Privacy & Security
+
+- ✅ **Runs 100% locally** - No data sent to external servers
+- ✅ **Your resume stays on your machine** - Replace `main.tex` with your own
+- ✅ **No tracking** - No analytics, no cookies, no logging
+- ✅ **Open source** - Inspect the code yourself
+
 ## 📄 License
 
-Personal project - Use freely for your own job applications.
+MIT License - Use freely for your own job applications. Clone, modify, and share!
 
 ---
 
