@@ -1,4 +1,10 @@
+
+
 # Resume Keyword Tailor
+
+
+https://github.com/user-attachments/assets/fbfe502b-23e5-43e7-9fbf-6af34e59b537
+
 
 ATS-optimized resume keyword injection tool. Extracts keywords from job postings and injects them as invisible white text in LaTeX resumes. **Verified 92.6% ATS detection rate** with **42.9% → 85.7% score improvement**.
 
