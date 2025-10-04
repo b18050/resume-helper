@@ -86,78 +86,64 @@ const renderWarnings = (warnings) => {
 };
 
 const renderExtractedKeywords = (allCandidates, missing, aiKeywords, aiEnabled) => {
+  const keywordsDetails = document.getElementById("keywords-details");
+  
   if (!allCandidates.length) {
-    resetCard(extractedCard);
+    keywordsDetails.classList.add("hidden");
     return;
   }
 
   const missingSet = new Set((missing || []).map((keyword) => keyword.toLowerCase()));
 
   const keywordChips = allCandidates
+    .slice(0, 15)
     .map((keyword, index) => {
       const isMissing = missingSet.has(keyword.toLowerCase());
       const statusClass = isMissing ? "keyword-tag--missing" : "keyword-tag--covered";
-      const statusLabel = isMissing ? "Missing" : "Covered";
-      return `<span class="keyword-tag ${statusClass}"><span>${statusLabel}</span>${keyword}</span>`;
+      return `<span class="keyword-tag ${statusClass}">${keyword}</span>`;
     })
     .join(" ");
 
-  extractedCard.classList.remove("hidden");
+  keywordsDetails.classList.remove("hidden");
   extractedCard.innerHTML = `
-    <div class="space-y-4">
-      <div class="flex items-center justify-between text-sm text-white/60">
-        <h3 class="text-base font-semibold text-white/85">Extracted keywords</h3>
-        <span>${allCandidates.length} detected${aiEnabled ? ` · AI boost ${aiKeywords.length}` : ""}</span>
-      </div>
-      <div class="flex flex-wrap gap-2">${keywordChips}</div>
-      <p class="text-xs text-white/40">Green tags already appear in your resume. Red tags were not found and will be added as hidden keywords.${aiEnabled ? " Keywords with AI assist are merged with heuristic results." : ""}</p>
-    </div>
+    <div class="flex flex-wrap gap-2">${keywordChips}</div>
+    ${allCandidates.length > 15 ? `<p class="text-xs text-white/40 mt-2">...and ${allCandidates.length - 15} more</p>` : ""}
   `;
 };
 
 const renderKeywords = (missing, allCandidates) => {
-  keywordsCard.classList.remove("hidden");
-
   if (!missing.length) {
     keywordsCard.innerHTML = `
-      <h3 class="text-base font-semibold text-white/80">No new keywords needed</h3>
-      <p class="mt-2 text-sm text-white/60">Your resume already covers the strongest signals from this posting. Any previous hidden block has been cleaned up.</p>
+      <p class="text-sm text-white/60">✓ Resume already covers all keywords</p>
     `;
     return;
   }
 
   const missingTags = missing
-    .map((keyword, index) => `<span class="keyword-tag"><span>${index + 1}</span>${keyword}</span>`)
-    .join(" ");
-
-  const candidateSnippet = allCandidates
-    .slice(0, 12)
+    .slice(0, 10)
     .map((keyword) => `<span class="keyword-tag">${keyword}</span>`)
     .join(" ");
 
   keywordsCard.innerHTML = `
-    <div class="space-y-5">
-      <div>
-        <h3 class="text-base font-semibold text-white/80">Invisible keyword payload</h3>
-        <div class="mt-3 flex flex-wrap gap-2">${missingTags}</div>
-      </div>
-      <div>
-        <h3 class="text-sm uppercase tracking-widest text-white/40">Top matches from the posting</h3>
-        <div class="mt-2 flex flex-wrap gap-2 text-xs text-white/60">${candidateSnippet}</div>
-      </div>
+    <div>
+      <p class="text-sm font-semibold text-white/80">${missing.length} keywords to add:</p>
+      <div class="mt-2 flex flex-wrap gap-2">${missingTags}</div>
+      ${missing.length > 10 ? `<p class="text-xs text-white/40 mt-2">...and ${missing.length - 10} more</p>` : ""}
     </div>
   `;
 };
 
 const renderWhiteBlock = (block) => {
-  blockCard.classList.remove("hidden");
-  const safeBlock = (block || "No hidden block generated.")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  blockCard.innerHTML = `
-    <h3 class="text-base font-semibold text-white/80">LaTeX injection preview</h3>
-    <pre class="code-block mt-3">${safeBlock}</pre>
-  `;
+  const latexDetails = document.getElementById("latex-details");
+  
+  if (!block) {
+    latexDetails.classList.add("hidden");
+    return;
+  }
+  
+  const safeBlock = block.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  latexDetails.classList.remove("hidden");
+  blockCard.innerHTML = `<pre class="code-block text-xs">${safeBlock}</pre>`;
 };
 
 const buildSummary = (missingCount, candidateCount, aiEnabled) => {
