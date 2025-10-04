@@ -95,9 +95,9 @@ const renderExtractedKeywords = (allCandidates, missing, aiKeywords, aiEnabled) 
 
   const missingSet = new Set((missing || []).map((keyword) => keyword.toLowerCase()));
 
+  // Show all keywords, not just first 15
   const keywordChips = allCandidates
-    .slice(0, 15)
-    .map((keyword, index) => {
+    .map((keyword) => {
       const isMissing = missingSet.has(keyword.toLowerCase());
       const statusClass = isMissing ? "keyword-tag--missing" : "keyword-tag--covered";
       return `<span class="keyword-tag ${statusClass}">${keyword}</span>`;
@@ -105,31 +105,39 @@ const renderExtractedKeywords = (allCandidates, missing, aiKeywords, aiEnabled) 
     .join(" ");
 
   keywordsDetails.classList.remove("hidden");
-  keywordsDetails.open = true; // Auto-expand
+  keywordsDetails.open = false; // Keep collapsed by default
   extractedCard.innerHTML = `
-    <div class="flex flex-wrap gap-2">${keywordChips}</div>
-    ${allCandidates.length > 15 ? `<p class="text-xs text-white/40 mt-2">...and ${allCandidates.length - 15} more</p>` : ""}
+    <div>
+      <p class="text-sm font-semibold text-white/80 mb-2">All extracted keywords (${allCandidates.length}):</p>
+      <div class="flex flex-wrap gap-2">${keywordChips}</div>
+      <p class="text-xs text-white/40 mt-3">
+        <span class="text-green-400">Green</span> = already in resume • 
+        <span class="text-red-400">Red</span> = will be added as hidden keywords
+      </p>
+    </div>
   `;
 };
 
 const renderKeywords = (missing, allCandidates) => {
   if (!missing.length) {
     keywordsCard.innerHTML = `
-      <p class="text-sm text-white/60">✓ Resume already covers all keywords</p>
+      <div class="mt-4 pt-4 border-t border-white/10">
+        <p class="text-sm text-green-400">✓ Resume already covers all keywords - no changes needed!</p>
+      </div>
     `;
     return;
   }
 
+  // Show all missing keywords
   const missingTags = missing
-    .slice(0, 10)
-    .map((keyword) => `<span class="keyword-tag">${keyword}</span>`)
+    .map((keyword) => `<span class="keyword-tag keyword-tag--missing">${keyword}</span>`)
     .join(" ");
 
   keywordsCard.innerHTML = `
-    <div>
-      <p class="text-sm font-semibold text-white/80">${missing.length} keywords to add:</p>
-      <div class="mt-2 flex flex-wrap gap-2">${missingTags}</div>
-      ${missing.length > 10 ? `<p class="text-xs text-white/40 mt-2">...and ${missing.length - 10} more</p>` : ""}
+    <div class="mt-4 pt-4 border-t border-white/10">
+      <p class="text-sm font-semibold text-white/80 mb-2">Hidden keywords to inject (${missing.length}):</p>
+      <div class="flex flex-wrap gap-2">${missingTags}</div>
+      <p class="text-xs text-white/40 mt-3">These will be added as invisible white text in your PDF</p>
     </div>
   `;
 };
