@@ -36,7 +36,22 @@ const resetCard = (card) => {
 };
 
 const resetResults = () => {
-  [statusCard, warningCard, extractedCard, keywordsCard, blockCard].forEach(resetCard);
+  // Reset individual cards
+  resetCard(statusCard);
+  resetCard(warningCard);
+  
+  // Reset collapsible sections
+  const keywordsDetails = document.getElementById("keywords-details");
+  const latexDetails = document.getElementById("latex-details");
+  
+  keywordsDetails.classList.add("hidden");
+  latexDetails.classList.add("hidden");
+  
+  // Clear content but don't hide the inner cards
+  extractedCard.innerHTML = "";
+  keywordsCard.innerHTML = "";
+  blockCard.innerHTML = "";
+  
   downloadWrapper.classList.add("hidden");
   latestResumeContent = "";
 };
