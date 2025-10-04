@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import List
 
 from flask import Flask, jsonify, render_template, request, send_file
+from flasgger import Swagger
 
 from services.ai_keyword_extractor import extract_keywords_via_openai
 from services.keyword_extractor import extract_keywords, fetch_job_description
@@ -28,6 +29,48 @@ app = Flask(
 app.logger.setLevel(logging.INFO)
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024  # limit uploads to 8 MB
 
+# Initialize Swagger
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": "apispec",
+            "route": "/apispec.json",
+            "rule_filter": lambda rule: True,
+            "model_filter": lambda tag: True,
+        }
+    ],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/api/docs",
+}
+
+swagger_template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "Resume Keyword Tailor API",
+        "description": "ATS-optimized resume keyword injection API. Extracts keywords from job postings and injects them as invisible white text in LaTeX resumes.",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Resume Helper",
+            "url": "https://github.com/b18050/resume-helper",
+        },
+    },
+    "schemes": ["http"],
+    "tags": [
+        {
+            "name": "Resume Processing",
+            "description": "Process resumes and extract keywords",
+        },
+        {
+            "name": "PDF Generation",
+            "description": "Compile LaTeX to PDF",
+        },
+    ],
+}
+
+swagger = Swagger(app, config=swagger_config, template=swagger_template)
+
 
 @app.route("/")
 def index() -> str:
@@ -36,6 +79,91 @@ def index() -> str:
 
 @app.post("/api/process")
 def process_resume():
+    """
+    Process resume and inject keywords
+    ---
+    tags:
+      - Resume Processing
+    consumes:
+      - multipart/form-data
+    parameters:
+      - name: company_name
+        in: formData
+        type: string
+        required: true
+        description: Company name for organizing output files
+      - name: job_url
+        in: formData
+        type: string
+        required: false
+        description: URL of job posting to scrape
+      - name: job_description
+        in: formData
+        type: string
+        required: false
+        description: Manual job description text (if no URL provided)
+      - name: keyword_target
+        in: formData
+        type: integer
+        default: 20
+        description: Maximum number of hidden keywords to inject
+      - name: resume_source
+        in: formData
+        type: string
+        enum: [default, upload]
+        default: default
+        description: Use main.tex or upload custom file
+      - name: resume
+        in: formData
+        type: file
+        required: false
+        description: LaTeX resume file (if resume_source is 'upload')
+      - name: use_ai_keywords
+        in: formData
+        type: boolean
+        default: false
+        description: Enable OpenAI GPT keyword enhancement
+    responses:
+      200:
+        description: Resume processed successfully
+        schema:
+          type: object
+          properties:
+            scraped_from_url:
+              type: boolean
+            keyword_candidates:
+              type: array
+              items:
+                type: string
+            ai_keywords:
+              type: array
+              items:
+                type: string
+            ai_enabled:
+              type: boolean
+            missing_keywords:
+              type: array
+              items:
+                type: string
+            white_block:
+              type: string
+            updated_resume:
+              type: string
+            modified:
+              type: boolean
+            warnings:
+              type: array
+              items:
+                type: string
+            company_name:
+              type: string
+            safe_company_name:
+              type: string
+            output_dir:
+              type: string
+      400:
+        description: Bad request (missing parameters or invalid input)
+    """
     warnings: List[str] = []
     
     # Get company name for directory organization
@@ -189,7 +317,41 @@ def process_resume():
 
 @app.post("/api/compile-pdf")
 def compile_pdf():
-    """Compile LaTeX resume to PDF and return the PDF file."""
+    """
+    Compile LaTeX to PDF
+    ---
+    tags:
+      - PDF Generation
+    consumes:
+      - application/json
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - latex_content
+          properties:
+            latex_content:
+              type: string
+              description: LaTeX source code to compile
+            company_name:
+              type: string
+              description: Company name for saving PDF to specific folder
+    responses:
+      200:
+        description: PDF compiled successfully
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+      400:
+        description: Bad request (no LaTeX content provided)
+      500:
+        description: PDF compilation failed or timeout
+    """
     try:
         latex_content = request.json.get("latex_content", "")
         company_name = request.json.get("company_name", "").strip()
