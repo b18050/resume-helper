@@ -105,6 +105,7 @@ const renderExtractedKeywords = (allCandidates, missing, aiKeywords, aiEnabled) 
     .join(" ");
 
   keywordsDetails.classList.remove("hidden");
+  keywordsDetails.open = true; // Auto-expand
   extractedCard.innerHTML = `
     <div class="flex flex-wrap gap-2">${keywordChips}</div>
     ${allCandidates.length > 15 ? `<p class="text-xs text-white/40 mt-2">...and ${allCandidates.length - 15} more</p>` : ""}
@@ -143,6 +144,7 @@ const renderWhiteBlock = (block) => {
   
   const safeBlock = block.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   latexDetails.classList.remove("hidden");
+  latexDetails.open = false; // Keep collapsed by default
   blockCard.innerHTML = `<pre class="code-block text-xs">${safeBlock}</pre>`;
 };
 
